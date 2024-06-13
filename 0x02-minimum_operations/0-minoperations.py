@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-""""""
+""" Minimum Operations"""
 
 
 def minOperations(n: int) -> int:
-    """"""
+    """ Returns the fewest number of operations needed to result"""
     if n < 2:
         return 0
 
