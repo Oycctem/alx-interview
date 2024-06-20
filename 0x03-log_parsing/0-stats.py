@@ -1,53 +1,45 @@
-#!/usr/bin/env python3
-"""Reads stdin line by line and computes metrics"""
-import sys
+#!/usr/bin/python3
+""" script that reads stdin line by line and computes metrics """
+if __name__ == '__main__':
+    import sys
 
+    def print_results(statusCodes, fileSize):
+        """ Print statistics """
+        print("File size: {:d}".format(fileSize))
+        for statusCode, times in sorted(statusCodes.items()):
+            if times:
+                print("{:s}: {:d}".format(statusCode, times))
 
-def print_stats(total_size, status_codes):
-    """Prints the statistics"""
-    print(f"File size: {total_size}")
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print(f"{code}: {status_codes[code]}")
-
-
-if __name__ == "__main__":
-    total_size = 0
-    status_codes = {"200": 0,
-                    "301": 0,
-                    "400": 0,
-                    "401": 0,
-                    "403": 0,
-                    "404": 0,
-                    "405": 0,
-                    "500": 0
-                    }
-    line_count = 0
+    statusCodes = {"200": 0,
+                   "301": 0,
+                   "400": 0,
+                   "401": 0,
+                   "403": 0,
+                   "404": 0,
+                   "405": 0,
+                   "500": 0
+                   }
+    fileSize = 0
+    n_lines = 0
 
     try:
+        """ Read stdin line by line """
         for line in sys.stdin:
-            parts = line.split()
-            if len(parts) < 9:
-                continue
-
+            if n_lines != 0 and n_lines % 10 == 0:
+                """ After every 10 lines, print from the beginning """
+                print_results(statusCodes, fileSize)
+            n_lines += 1
+            data = line.split()
             try:
-                file_size = int(parts[-1])
-                status_code = int(parts[-2])
-                total_size += file_size
-
-                if status_code in status_codes:
-                    status_codes[status_code] += 1
-
-                line_count += 1
-
-                if line_count % 10 == 0:
-                    print_stats(total_size, status_codes)
-
-            except (ValueError, IndexError):
-                continue
-
+                """ Compute metrics """
+                statusCode = data[-2]
+                if statusCode in statusCodes:
+                    statusCodes[statusCode] += 1
+                fileSize += int(data[-1])
+            except:
+                pass
+        print_results(statusCodes, fileSize)
     except KeyboardInterrupt:
-        print_stats(total_size, status_codes)
+        """ Keyboard interruption, print from the beginning """
+        print_results(statusCodes, fileSize)
         raise
-
-    print_stats(total_size, status_codes)
