@@ -1,31 +1,25 @@
 #!/usr/bin/node
-const fetch = require('node-fetch');
-
-async function getMovieCharacters(movieId) {
-    const baseUrl = 'https://swapi.dev/api/films/';
-    try {
-        const response = await fetch(`${baseUrl}${movieId}/`);
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const movieData = await response.json();
-
-        const characterUrls = movieData.characters;
-
-        for (const url of characterUrls) {
-            const charResponse = await fetch(url);
-            if (!charResponse.ok) throw new Error(`HTTP error! Status: ${charResponse.status}`);
-            const charData = await charResponse.json();
-            console.log(charData.name);
-        }
-    } catch (error) {
-        console.error(`Error fetching data: ${error}`);
-    }
-}
-
+const request = require('request');
 const movieId = process.argv[2];
+const options = {
+  url: 'https://swapi-api.hbtn.io/api/films/' + movieId,
+  method: 'GET'
+};
 
-if (!movieId) {
-    console.error('Usage: node script.js <movie_id>');
-    process.exit(1);
+request(options, function (error, response, body) {
+  if (!error) {
+    const characters = JSON.parse(body).characters;
+    printCharacters(characters, 0);
+  }
+});
+
+function printCharacters (characters, index) {
+  request(characters[index], function (error, response, body) {
+    if (!error) {
+      console.log(JSON.parse(body).name);
+      if (index + 1 < characters.length) {
+        printCharacters(characters, index + 1);
+      }
+    }
+  });
 }
-
-getMovieCharacters(movieId);
