@@ -8,14 +8,14 @@ def primes(n):
     """
     Returns list of prime numbers
     """
-    i = []
-    j = [True] * (n + 1)
+    prime = []
+    sieve = [True] * (n + 1)
     for p in range(2, n + 1):
-        if (j[p]):
-            i.append(p)
+        if (sieve[p]):
+            prime.append(p)
             for i in range(p, n + 1, p):
-                j[i] = False
-    return i
+                sieve[i] = False
+    return prime
 
 
 def isWinner(x, nums):
